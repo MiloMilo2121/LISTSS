@@ -17,6 +17,7 @@ from list_engine.scoring.models import (
     ScoreResult,
     SignalWeights,
     Tier,
+    TierAssignment,
 )
 
 
@@ -107,3 +108,57 @@ def test_score_result_checks_arithmetic_and_t0_reason() -> None:
             scored_at=datetime(2026, 7, 15, tzinfo=UTC),
             recalculation_reason=RecalculationReason.MANUAL,
         )
+
+
+def test_capacity_assignment_cannot_promote_suppressed_or_unqualified_scores() -> None:
+    breakdown = ScoreBreakdown(fit={}, signal={}, reachability={})
+    suppressed = ScoreResult(
+        piva=company().piva,
+        scoring_version="segment@v1",
+        fit_score=0,
+        signal_score=0,
+        reachability_score=0,
+        total_score=0,
+        eligible_tier=Tier.T0,
+        active_trigger=False,
+        exclusion_reasons=("suppression:opt_out",),
+        breakdown=breakdown,
+        scored_at=datetime(2026, 7, 15, tzinfo=UTC),
+        recalculation_reason=RecalculationReason.WEEKLY,
+    )
+
+    with pytest.raises(ValidationError, match="only preserve or lower"):
+        TierAssignment(score=suppressed, assigned_tier=Tier.T1, queue_rank=1)
+
+    audit_only = TierAssignment(score=suppressed, assigned_tier=Tier.T0)
+    assert audit_only.queue_rank is None
+
+
+def test_actionable_assignment_requires_rank_and_downgrade_reason() -> None:
+    breakdown = ScoreBreakdown(fit={}, signal={}, reachability={})
+    eligible = ScoreResult(
+        piva=company().piva,
+        scoring_version="segment@v1",
+        fit_score=35,
+        signal_score=30,
+        reachability_score=15,
+        total_score=80,
+        eligible_tier=Tier.T1,
+        active_trigger=True,
+        breakdown=breakdown,
+        scored_at=datetime(2026, 7, 15, tzinfo=UTC),
+        recalculation_reason=RecalculationReason.WEEKLY,
+    )
+
+    with pytest.raises(ValidationError, match="queue rank"):
+        TierAssignment(score=eligible, assigned_tier=Tier.T1)
+    with pytest.raises(ValidationError, match="capacity_reason"):
+        TierAssignment(score=eligible, assigned_tier=Tier.T2, queue_rank=1)
+
+    downgraded = TierAssignment(
+        score=eligible,
+        assigned_tier=Tier.T2,
+        queue_rank=1,
+        capacity_reason="T1 capacity exhausted",
+    )
+    assert downgraded.assigned_tier is Tier.T2

@@ -257,6 +257,27 @@ class TierAssignment(BaseModel):
     queue_rank: int | None = Field(default=None, ge=1)
     capacity_reason: str | None = Field(default=None, min_length=1, max_length=255)
 
+    @model_validator(mode="after")
+    def validate_capacity_transition(self) -> Self:
+        allowed = {
+            Tier.T0: {Tier.T0},
+            Tier.T1: {Tier.T1, Tier.T2, Tier.T3},
+            Tier.T2: {Tier.T2, Tier.T3},
+            Tier.T3: {Tier.T3},
+            Tier.UNQUALIFIED: {Tier.UNQUALIFIED},
+        }
+        if self.assigned_tier not in allowed[self.score.eligible_tier]:
+            raise ValueError("capacity allocation may only preserve or lower an eligible tier")
+
+        is_actionable = self.assigned_tier in {Tier.T1, Tier.T2, Tier.T3}
+        if is_actionable != (self.queue_rank is not None):
+            raise ValueError("only actionable tier assignments require a queue rank")
+
+        was_downgraded = self.assigned_tier is not self.score.eligible_tier
+        if was_downgraded != (self.capacity_reason is not None):
+            raise ValueError("capacity_reason is required exactly for a tier downgrade")
+        return self
+
 
 __all__ = [
     "FitWeights",
