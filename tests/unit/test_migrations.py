@@ -78,3 +78,13 @@ def test_ingestion_migration_distinguishes_quality_empty_and_failure_states() ->
     assert "data_quality_issues_append_only" in ingestion
     assert "source_record_processing_append_only" in ingestion
     assert "ON source_records (source, payload_hash)" in ingestion
+
+
+def test_scoring_migration_scopes_activation_per_segment_and_freezes_scores() -> None:
+    scoring = (ROOT / "supabase" / "migrations" / "202607150003_scoring.sql").read_text()
+
+    assert "ADD COLUMN IF NOT EXISTS segment_id" in scoring
+    assert "one_active_scoring_version_per_segment" in scoring
+    assert "ON scoring_weight_versions (segment_id)" in scoring
+    assert "scores_append_only" in scoring
+    assert "BEFORE UPDATE OR DELETE ON scores" in scoring

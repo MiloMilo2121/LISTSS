@@ -1,0 +1,63 @@
+# Illustrative hypothesis: validate bands and triggers against observed outcomes.
+schema_version: 1
+segment_id: construction_north_it
+version: "v1"
+status: hypothesis
+persona: "Titolare o responsabile amministrazione di un'impresa edile del Nord Italia"
+ateco_prefixes:
+  - "41"
+  - "42"
+  - "43"
+revenue_band_eur:
+  minimum: 1000000
+  sweet_minimum: 5000000
+  sweet_maximum: 50000000
+  maximum: 100000000
+employee_band:
+  minimum: 10
+  sweet_minimum: 30
+  sweet_maximum: 150
+  maximum: 400
+target_regions:
+  - Piemonte
+  - Lombardia
+  - Veneto
+  - Emilia-Romagna
+  - Friuli-Venezia Giulia
+  - Trentino-Alto Adige
+  - Liguria
+  - Valle d'Aosta
+excluded_company_statuses:
+  - ceased
+  - inactive
+  - suspended
+  - liquidazione
+  - procedura_concorsuale
+hot_signal_types:
+  - new_site
+  - governance_change
+  - administrative_hiring
+  - public_contract_award
+signal_lookback_days: 90
+growth_full_score_at: 0.20
+multi_source_full_score_at: 3
+weights:
+  fit:
+    ateco: 10
+    revenue: 10
+    structure: 10
+    digital_maturity: 5
+    geography: 5
+  signal:
+    fresh_trigger: 15
+    growth: 10
+    administrative_hiring: 10
+    engagement: 5
+  reachability:
+    decision_maker: 8
+    phone: 6
+    email: 3
+    multi_source: 3
+capacity:
+  t1_per_bdr: 35
+  t2_per_bdr: 70
