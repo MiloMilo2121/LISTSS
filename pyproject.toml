@@ -11,6 +11,7 @@ requires-python = ">=3.12,<3.14"
 license = { text = "Proprietary" }
 authors = [{ name = "Marco Milanello" }]
 dependencies = [
+  "httpx==0.28.1",
   "pydantic==2.13.4",
   "psycopg[binary]==3.3.4",
 ]

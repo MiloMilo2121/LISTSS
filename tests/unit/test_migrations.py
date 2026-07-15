@@ -58,3 +58,23 @@ def test_migrations_are_replay_safe_by_construction() -> None:
     assert "ON CONFLICT (piva, source, valid_from) DO NOTHING" in seed
     assert "CREATE SCHEMA IF NOT EXISTS list_engine" in initial
     assert "REVOKE ALL ON SCHEMA list_engine FROM PUBLIC" in initial
+
+
+def test_ingestion_migration_distinguishes_quality_empty_and_failure_states() -> None:
+    ingestion = (ROOT / "supabase" / "migrations" / "202607150002_ingestion.sql").read_text()
+
+    declared = set(re.findall(r"CREATE TABLE IF NOT EXISTS ([a-z_]+)", ingestion))
+    assert {
+        "ingestion_runs",
+        "source_record_processing",
+        "source_schema_snapshots",
+        "data_quality_issues",
+    } <= declared
+    assert "'empty_verified'" in ingestion
+    assert "empty_proof IS NOT NULL" in ingestion
+    assert "warning_count integer" in ingestion
+    assert "quarantine_replay_guard" in ingestion
+    assert "data_quality_issue_replay_guard" in ingestion
+    assert "data_quality_issues_append_only" in ingestion
+    assert "source_record_processing_append_only" in ingestion
+    assert "ON source_records (source, payload_hash)" in ingestion
