@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sibill-list-engine"
+version = "0.1.0"
+description = "Agentic, compliance-first B2B prospect prioritisation for the Italian market"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = { text = "Proprietary" }
+authors = [{ name = "Marco Milanello" }]
+dependencies = [
+  "pydantic==2.13.4",
+  "psycopg[binary]==3.3.4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy==2.3.0",
+  "pytest==9.1.1",
+  "pytest-cov==7.1.0",
+  "ruff==0.15.21",
+]
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/list_engine"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
