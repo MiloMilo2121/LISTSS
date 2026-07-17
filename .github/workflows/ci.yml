@@ -30,8 +30,41 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv sync --frozen --extra dev
+      - run: uv sync --frozen --extra dev --extra agent
       - run: uv run ruff format --check .
       - run: uv run ruff check .
       - run: uv run mypy
+      - name: Blocking research golden-set evaluation
+        run: >-
+          uv run python -m list_engine.research.eval
+          --golden evals/golden/research_cases.json
+          | tee research-eval-report.json
+      - name: Optional Claude semantic regression gate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_AGENT_MODEL: ${{ vars.ANTHROPIC_AGENT_MODEL }}
+          ANTHROPIC_JUDGE_MODEL: ${{ vars.ANTHROPIC_JUDGE_MODEL }}
+        run: |
+          if [[ -z "$ANTHROPIC_API_KEY" || -z "$ANTHROPIC_AGENT_MODEL" || -z "$ANTHROPIC_JUDGE_MODEL" ]]; then
+            echo "Claude eval skipped: configure the API key and both model variables."
+            exit 0
+          fi
+          uv run python -m list_engine.research.eval \
+            --golden evals/golden/research_cases.json \
+            --agent claude \
+            --agent-model "$ANTHROPIC_AGENT_MODEL" \
+            --agent-max-budget-usd 0.10 \
+            --semantic-judge claude \
+            --judge-model "$ANTHROPIC_JUDGE_MODEL" \
+            --judge-max-budget-usd 0.05 \
+            | tee research-semantic-eval-report.json
+      - name: Preserve research quality report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-eval-report
+          path: |
+            research-eval-report.json
+            research-semantic-eval-report.json
+          if-no-files-found: ignore
       - run: uv run pytest --cov=list_engine --cov-report=term-missing

@@ -88,3 +88,21 @@ def test_scoring_migration_scopes_activation_per_segment_and_freezes_scores() ->
     assert "ON scoring_weight_versions (segment_id)" in scoring
     assert "scores_append_only" in scoring
     assert "BEFORE UPDATE OR DELETE ON scores" in scoring
+
+
+def test_research_migration_separates_immutable_audit_from_approved_cache() -> None:
+    research = (ROOT / "supabase" / "migrations" / "202607150004_research.sql").read_text()
+
+    declared = set(re.findall(r"CREATE TABLE IF NOT EXISTS ([a-z_]+)", research))
+    assert {"research_cache", "research_generation_leases"} <= declared
+    assert "input_hash ~ '^[a-f0-9]{64}$'" in research
+    assert "evaluation @> '{\"passed\": true}'::jsonb" in research
+    assert "UNIQUE (input_hash, provider, model, prompt_version)" in research
+    assert "agent_sessions_completed_immutable" in research
+    assert "completed agent sessions are immutable" in research
+    assert "agent_session_id uuid NOT NULL REFERENCES agent_sessions" in research
+    assert "PRIMARY KEY (input_hash, provider, model, prompt_version)" in research
+    assert "'superseded'" in research
+    assert "agent_sessions_research_identity_check" in research
+    assert "requested_model IS NOT NULL" in research
+    assert "lease_owner_token IS NOT NULL" in research

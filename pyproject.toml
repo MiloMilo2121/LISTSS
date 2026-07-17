@@ -24,6 +24,9 @@ dev = [
   "pytest-cov==7.1.0",
   "ruff==0.15.21",
 ]
+agent = [
+  "claude-agent-sdk==0.2.119",
+]
 
 
 [tool.hatch.build.targets.wheel]

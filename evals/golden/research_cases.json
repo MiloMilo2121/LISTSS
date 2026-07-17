@@ -1,0 +1,1050 @@
+{
+  "dataset_version": "research-golden-2026-07-v1",
+  "thresholds": {
+    "minimum_dimension_score": 0.65,
+    "minimum_mean_score": 0.9,
+    "minimum_case_pass_rate": 1.0,
+    "baseline_mean_score": 0.95,
+    "maximum_mean_regression": 0.05
+  },
+  "cases": [
+    {
+      "case_id": "official_registry_fact",
+      "description": "A single verified registry fact becomes the fact and fallback hook.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": null,
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "reg01",
+            "source_url": "https://registry.case01.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro imprese sintetico",
+            "excerpt": "La societa risulta attiva nel registro pubblico.",
+            "observed_at": "2026-07-01T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          }
+        ],
+        "as_of": "2026-07-01"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "reg01"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "reg01"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "risulta attiva"
+        ]
+      }
+    },
+    {
+      "case_id": "new_branch_signal",
+      "description": "A verified new-branch signal is also selected as the opening hook.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case02.invalid",
+        "hub_data": {
+          "segment": "construction"
+        },
+        "evidence": [
+          {
+            "evidence_id": "branch02",
+            "source_url": "https://registry.case02.invalid/units",
+            "source_kind": "official_registry",
+            "title": "Unita locali",
+            "excerpt": "Una nuova unita locale e stata registrata a maggio 2026.",
+            "observed_at": "2026-07-02T08:30:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:new_branch"
+            ],
+            "valid_until": "2026-08-01"
+          }
+        ],
+        "as_of": "2026-07-02"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "branch02"
+        ],
+        "signal_evidence_ids": [
+          "branch02"
+        ],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "branch02"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "nuova unita locale"
+        ]
+      }
+    },
+    {
+      "case_id": "hiring_persona_signal",
+      "description": "A job post can support a labelled persona hypothesis and a hiring signal.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case03.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "job03",
+            "source_url": "https://jobs.case03.invalid/admin-role",
+            "source_kind": "job_board",
+            "title": "Annuncio amministrazione",
+            "excerpt": "L'azienda cerca una persona per ampliare l'ufficio amministrativo.",
+            "observed_at": "2026-07-03T10:00:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:hiring",
+              "persona:responsabile amministrativo"
+            ],
+            "valid_until": "2026-08-02"
+          }
+        ],
+        "as_of": "2026-07-03"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "job03"
+        ],
+        "signal_evidence_ids": [
+          "job03"
+        ],
+        "persona_evidence_ids": [
+          "job03"
+        ],
+        "hook_evidence_ids": [
+          "job03"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "ufficio amministrativo"
+        ]
+      }
+    },
+    {
+      "case_id": "two_first_party_sources",
+      "description": "Registry and company-site evidence retain source order and explicit hook priority.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case04.invalid",
+        "hub_data": {
+          "tier": "T1"
+        },
+        "evidence": [
+          {
+            "evidence_id": "reg04",
+            "source_url": "https://registry.case04.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro",
+            "excerpt": "L'impresa ha sede legale in Lombardia.",
+            "observed_at": "2026-07-04T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "site04",
+            "source_url": "https://company.case04.invalid/chi-siamo",
+            "source_kind": "company_website",
+            "title": "Chi siamo",
+            "excerpt": "Il sito aziendale descrive un team dedicato alla gestione fornitori.",
+            "observed_at": "2026-07-04T09:05:00+02:00",
+            "verified": true,
+            "tags": [
+              "persona:responsabile acquisti",
+              "hook:supplier_operations"
+            ]
+          }
+        ],
+        "as_of": "2026-07-04"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "reg04",
+          "site04"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": [
+          "site04"
+        ],
+        "hook_evidence_ids": [
+          "site04"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "Lombardia",
+          "gestione fornitori"
+        ]
+      }
+    },
+    {
+      "case_id": "unverified_is_omitted",
+      "description": "An attractive but unverified claim cannot enter any dossier field.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": null,
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "rumor05",
+            "source_url": "https://directory.case05.invalid/rumor",
+            "source_kind": "public_directory",
+            "title": "Dato non verificato",
+            "excerpt": "La directory attribuisce una crescita del cento per cento.",
+            "observed_at": "2026-07-05T08:00:00+02:00",
+            "verified": false,
+            "tags": [
+              "signal:growth",
+              "hook:growth"
+            ],
+            "valid_until": "2026-08-04"
+          },
+          {
+            "evidence_id": "reg05",
+            "source_url": "https://registry.case05.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Stato impresa",
+            "excerpt": "Lo stato dell'impresa e attivo.",
+            "observed_at": "2026-07-05T08:10:00+02:00",
+            "verified": true,
+            "tags": []
+          }
+        ],
+        "as_of": "2026-07-05"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "reg05"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "reg05"
+        ],
+        "omitted_evidence_ids": [
+          "rumor05"
+        ],
+        "required_claim_fragments": [
+          "stato dell'impresa"
+        ]
+      }
+    },
+    {
+      "case_id": "three_fact_cap",
+      "description": "The dossier keeps at most three facts while a fourth item may support the hook.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case06.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "fact06a",
+            "source_url": "https://registry.case06.invalid/status",
+            "source_kind": "official_registry",
+            "title": "Stato",
+            "excerpt": "L'impresa risulta attiva.",
+            "observed_at": "2026-07-06T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "fact06b",
+            "source_url": "https://registry.case06.invalid/location",
+            "source_kind": "official_registry",
+            "title": "Sede",
+            "excerpt": "La sede dichiarata e a Bergamo.",
+            "observed_at": "2026-07-06T09:01:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "fact06c",
+            "source_url": "https://company.case06.invalid/services",
+            "source_kind": "company_website",
+            "title": "Servizi",
+            "excerpt": "Il sito presenta servizi per cantieri industriali.",
+            "observed_at": "2026-07-06T09:02:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "hook06d",
+            "source_url": "https://company.case06.invalid/news",
+            "source_kind": "company_website",
+            "title": "Novita",
+            "excerpt": "L'azienda annuncia l'apertura di un nuovo magazzino.",
+            "observed_at": "2026-07-06T09:03:00+02:00",
+            "verified": true,
+            "tags": [
+              "hook:new_warehouse"
+            ]
+          }
+        ],
+        "as_of": "2026-07-06"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "fact06a",
+          "fact06b",
+          "fact06c"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "hook06d"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "cantieri industriali"
+        ]
+      }
+    },
+    {
+      "case_id": "multiple_active_signals",
+      "description": "All verified signal-tagged evidence remains visible in source order.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case07.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "sig07a",
+            "source_url": "https://registry.case07.invalid/branch",
+            "source_kind": "official_registry",
+            "title": "Nuova sede",
+            "excerpt": "Una sede secondaria e stata iscritta nel registro.",
+            "observed_at": "2026-07-07T09:00:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:new_branch"
+            ],
+            "valid_until": "2026-08-06"
+          },
+          {
+            "evidence_id": "sig07b",
+            "source_url": "https://jobs.case07.invalid/controller",
+            "source_kind": "job_board",
+            "title": "Ricerca controller",
+            "excerpt": "E pubblicata una ricerca per un controller junior.",
+            "observed_at": "2026-07-07T09:05:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:hiring"
+            ],
+            "valid_until": "2026-08-06"
+          }
+        ],
+        "as_of": "2026-07-07"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "sig07a",
+          "sig07b"
+        ],
+        "signal_evidence_ids": [
+          "sig07a",
+          "sig07b"
+        ],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "sig07a"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "controller junior"
+        ]
+      }
+    },
+    {
+      "case_id": "explicit_hook_precedence",
+      "description": "An explicit hook outranks an earlier signal for opening selection.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case08.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "sig08",
+            "source_url": "https://jobs.case08.invalid/post",
+            "source_kind": "job_board",
+            "title": "Annuncio",
+            "excerpt": "L'azienda ricerca una figura amministrativa.",
+            "observed_at": "2026-07-08T10:00:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:hiring"
+            ],
+            "valid_until": "2026-08-07"
+          },
+          {
+            "evidence_id": "hook08",
+            "source_url": "https://company.case08.invalid/news",
+            "source_kind": "company_website",
+            "title": "Progetto",
+            "excerpt": "Il sito presenta un nuovo progetto di digitalizzazione contabile.",
+            "observed_at": "2026-07-08T10:05:00+02:00",
+            "verified": true,
+            "tags": [
+              "hook:digital_accounting"
+            ]
+          }
+        ],
+        "as_of": "2026-07-08"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "sig08",
+          "hook08"
+        ],
+        "signal_evidence_ids": [
+          "sig08"
+        ],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "hook08"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "digitalizzazione contabile"
+        ]
+      }
+    },
+    {
+      "case_id": "persona_from_second_source",
+      "description": "Persona remains a labelled inference and cites the source that carries its tag.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case09.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "reg09",
+            "source_url": "https://registry.case09.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro",
+            "excerpt": "L'impresa opera nel settore manifatturiero.",
+            "observed_at": "2026-07-09T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "site09",
+            "source_url": "https://company.case09.invalid/team",
+            "source_kind": "company_website",
+            "title": "Team",
+            "excerpt": "Il sito mostra una funzione finance interna.",
+            "observed_at": "2026-07-09T09:10:00+02:00",
+            "verified": true,
+            "tags": [
+              "persona:finance manager"
+            ]
+          }
+        ],
+        "as_of": "2026-07-09"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "reg09",
+          "site09"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": [
+          "site09"
+        ],
+        "hook_evidence_ids": [
+          "reg09"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "finance interna"
+        ]
+      }
+    },
+    {
+      "case_id": "public_directory_fact",
+      "description": "A verified public directory is usable but remains explicitly typed as weaker evidence.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": null,
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "dir10",
+            "source_url": "https://directory.case10.invalid/profile",
+            "source_kind": "public_directory",
+            "title": "Profilo pubblico",
+            "excerpt": "La directory pubblica riporta un centralino aziendale.",
+            "observed_at": "2026-07-10T11:00:00+02:00",
+            "verified": true,
+            "tags": []
+          }
+        ],
+        "as_of": "2026-07-10"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "dir10"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "dir10"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "centralino aziendale"
+        ]
+      }
+    },
+    {
+      "case_id": "crm_verified_context",
+      "description": "Verified CRM context can be cited without being silently upgraded to an external fact.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": null,
+        "hub_data": {
+          "owner": "demo-bdr"
+        },
+        "evidence": [
+          {
+            "evidence_id": "crm11",
+            "source_url": "https://crm.case11.invalid/record",
+            "source_kind": "crm",
+            "title": "Nota CRM verificata",
+            "excerpt": "La nota registra un precedente contatto con il centralino.",
+            "observed_at": "2026-07-11T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          }
+        ],
+        "as_of": "2026-07-11"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "crm11"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "crm11"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "precedente contatto"
+        ]
+      }
+    },
+    {
+      "case_id": "mixed_source_packet",
+      "description": "A mixed registry, website and job-board packet preserves all supported dimensions.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case12.invalid",
+        "hub_data": {
+          "score": 78
+        },
+        "evidence": [
+          {
+            "evidence_id": "reg12",
+            "source_url": "https://registry.case12.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro",
+            "excerpt": "La societa ha una unita locale nel Nord Italia.",
+            "observed_at": "2026-07-12T08:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "site12",
+            "source_url": "https://company.case12.invalid/about",
+            "source_kind": "company_website",
+            "title": "Azienda",
+            "excerpt": "Il sito descrive lavorazioni per clienti industriali.",
+            "observed_at": "2026-07-12T08:05:00+02:00",
+            "verified": true,
+            "tags": [
+              "hook:industrial_clients"
+            ]
+          },
+          {
+            "evidence_id": "job12",
+            "source_url": "https://jobs.case12.invalid/accounting",
+            "source_kind": "job_board",
+            "title": "Annuncio accounting",
+            "excerpt": "E aperta una posizione per addetto alla contabilita.",
+            "observed_at": "2026-07-12T08:10:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:hiring",
+              "persona:responsabile amministrativo"
+            ],
+            "valid_until": "2026-08-11"
+          }
+        ],
+        "as_of": "2026-07-12"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "reg12",
+          "site12",
+          "job12"
+        ],
+        "signal_evidence_ids": [
+          "job12"
+        ],
+        "persona_evidence_ids": [
+          "job12"
+        ],
+        "hook_evidence_ids": [
+          "site12"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "addetto alla contabilita"
+        ]
+      }
+    },
+    {
+      "case_id": "whitespace_normalization",
+      "description": "Whitespace normalization must not break the evidence citation relationship.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case13.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "site13",
+            "source_url": "https://company.case13.invalid/news",
+            "source_kind": "company_website",
+            "title": "Aggiornamento",
+            "excerpt": "Il sito   comunica\nuna nuova linea di servizio.",
+            "observed_at": "2026-07-13T09:00:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:new_service"
+            ],
+            "valid_until": "2026-08-12"
+          }
+        ],
+        "as_of": "2026-07-13"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "site13"
+        ],
+        "signal_evidence_ids": [
+          "site13"
+        ],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "site13"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "comunica una nuova linea"
+        ]
+      }
+    },
+    {
+      "case_id": "italian_unicode_text",
+      "description": "Italian punctuation and accented text survive structured generation and evaluation.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case14.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "site14",
+            "source_url": "https://company.case14.invalid/azienda",
+            "source_kind": "company_website",
+            "title": "Identità aziendale",
+            "excerpt": "L’azienda dichiara attività nell’automazione per le PMI.",
+            "observed_at": "2026-07-14T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          }
+        ],
+        "as_of": "2026-07-14"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "site14"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "site14"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "automazione per le PMI"
+        ]
+      }
+    },
+    {
+      "case_id": "unverified_signal_ignored",
+      "description": "An unverified signal cannot override a verified non-signal fallback hook.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": null,
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "reg15",
+            "source_url": "https://registry.case15.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro",
+            "excerpt": "La societa risulta iscritta al registro.",
+            "observed_at": "2026-07-15T08:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "bad15",
+            "source_url": "https://directory.case15.invalid/signal",
+            "source_kind": "public_directory",
+            "title": "Segnale non confermato",
+            "excerpt": "La directory ipotizza una imminente espansione.",
+            "observed_at": "2026-07-15T08:05:00+02:00",
+            "verified": false,
+            "tags": [
+              "signal:expansion"
+            ],
+            "valid_until": "2026-08-14"
+          }
+        ],
+        "as_of": "2026-07-15"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "reg15"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "reg15"
+        ],
+        "omitted_evidence_ids": [
+          "bad15"
+        ],
+        "required_claim_fragments": [
+          "iscritta al registro"
+        ]
+      }
+    },
+    {
+      "case_id": "first_persona_wins",
+      "description": "Multiple persona hints resolve deterministically to the first verified source.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case16.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "team16a",
+            "source_url": "https://company.case16.invalid/team/finance",
+            "source_kind": "company_website",
+            "title": "Finance",
+            "excerpt": "Il sito presenta la funzione finance.",
+            "observed_at": "2026-07-16T09:00:00+02:00",
+            "verified": true,
+            "tags": [
+              "persona:finance manager"
+            ]
+          },
+          {
+            "evidence_id": "team16b",
+            "source_url": "https://company.case16.invalid/team/operations",
+            "source_kind": "company_website",
+            "title": "Operations",
+            "excerpt": "Il sito presenta anche la funzione operations.",
+            "observed_at": "2026-07-16T09:05:00+02:00",
+            "verified": true,
+            "tags": [
+              "persona:operations manager"
+            ]
+          }
+        ],
+        "as_of": "2026-07-16"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "team16a",
+          "team16b"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": [
+          "team16a"
+        ],
+        "hook_evidence_ids": [
+          "team16a"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "funzione operations"
+        ]
+      }
+    },
+    {
+      "case_id": "first_explicit_hook_wins",
+      "description": "Multiple explicit hook tags resolve deterministically to the first source.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case17.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "hook17a",
+            "source_url": "https://company.case17.invalid/news/one",
+            "source_kind": "company_website",
+            "title": "Primo aggiornamento",
+            "excerpt": "Il primo aggiornamento riguarda una nuova sede.",
+            "observed_at": "2026-07-17T09:00:00+02:00",
+            "verified": true,
+            "tags": [
+              "hook:new_site"
+            ]
+          },
+          {
+            "evidence_id": "hook17b",
+            "source_url": "https://company.case17.invalid/news/two",
+            "source_kind": "company_website",
+            "title": "Secondo aggiornamento",
+            "excerpt": "Il secondo aggiornamento riguarda un nuovo servizio.",
+            "observed_at": "2026-07-17T09:05:00+02:00",
+            "verified": true,
+            "tags": [
+              "hook:new_service"
+            ]
+          }
+        ],
+        "as_of": "2026-07-17"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "hook17a",
+          "hook17b"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "hook17a"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "secondo aggiornamento"
+        ]
+      }
+    },
+    {
+      "case_id": "signal_hook_fallback",
+      "description": "Without an explicit hook, the first verified signal becomes the opening evidence.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": null,
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "plain18",
+            "source_url": "https://registry.case18.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro",
+            "excerpt": "L'impresa e attiva.",
+            "observed_at": "2026-07-18T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "sig18",
+            "source_url": "https://jobs.case18.invalid/role",
+            "source_kind": "job_board",
+            "title": "Posizione aperta",
+            "excerpt": "E aperta una posizione amministrativa.",
+            "observed_at": "2026-07-18T09:05:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:hiring"
+            ],
+            "valid_until": "2026-08-17"
+          }
+        ],
+        "as_of": "2026-07-18"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "plain18",
+          "sig18"
+        ],
+        "signal_evidence_ids": [
+          "sig18"
+        ],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "sig18"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "posizione amministrativa"
+        ]
+      }
+    },
+    {
+      "case_id": "plain_hook_fallback",
+      "description": "Without hook or signal tags, the first verified item is the deterministic fallback.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case19.invalid",
+        "hub_data": {},
+        "evidence": [
+          {
+            "evidence_id": "first19",
+            "source_url": "https://registry.case19.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro",
+            "excerpt": "L'impresa ha sede in Veneto.",
+            "observed_at": "2026-07-19T09:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "second19",
+            "source_url": "https://company.case19.invalid/about",
+            "source_kind": "company_website",
+            "title": "Profilo",
+            "excerpt": "Il sito descrive una produzione su commessa.",
+            "observed_at": "2026-07-19T09:05:00+02:00",
+            "verified": true,
+            "tags": []
+          }
+        ],
+        "as_of": "2026-07-19"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "first19",
+          "second19"
+        ],
+        "signal_evidence_ids": [],
+        "persona_evidence_ids": null,
+        "hook_evidence_ids": [
+          "first19"
+        ],
+        "omitted_evidence_ids": [],
+        "required_claim_fragments": [
+          "produzione su commessa"
+        ]
+      }
+    },
+    {
+      "case_id": "bounded_mixed_packet",
+      "description": "A larger packet enforces fact cap, signal ordering, hook priority and unverified omission together.",
+      "research_input": {
+        "piva": "99000000002",
+        "website": "https://company.case20.invalid",
+        "hub_data": {
+          "segment": "manufacturing",
+          "tier": "T1"
+        },
+        "evidence": [
+          {
+            "evidence_id": "reg20",
+            "source_url": "https://registry.case20.invalid/company",
+            "source_kind": "official_registry",
+            "title": "Registro",
+            "excerpt": "L'impresa risulta attiva e ha sede in Emilia-Romagna.",
+            "observed_at": "2026-07-20T08:00:00+02:00",
+            "verified": true,
+            "tags": []
+          },
+          {
+            "evidence_id": "site20",
+            "source_url": "https://company.case20.invalid/about",
+            "source_kind": "company_website",
+            "title": "Azienda",
+            "excerpt": "Il sito descrive lavorazioni meccaniche conto terzi.",
+            "observed_at": "2026-07-20T08:02:00+02:00",
+            "verified": true,
+            "tags": [
+              "persona:responsabile amministrativo"
+            ]
+          },
+          {
+            "evidence_id": "job20",
+            "source_url": "https://jobs.case20.invalid/admin",
+            "source_kind": "job_board",
+            "title": "Ricerca amministrazione",
+            "excerpt": "L'azienda cerca un addetto amministrativo per inserimento immediato.",
+            "observed_at": "2026-07-20T08:04:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:hiring"
+            ],
+            "valid_until": "2026-08-19"
+          },
+          {
+            "evidence_id": "news20",
+            "source_url": "https://company.case20.invalid/news/plant",
+            "source_kind": "company_website",
+            "title": "Impianto",
+            "excerpt": "Una pagina aziendale presenta il nuovo impianto produttivo.",
+            "observed_at": "2026-07-20T08:06:00+02:00",
+            "verified": true,
+            "tags": [
+              "signal:new_plant",
+              "hook:new_plant"
+            ],
+            "valid_until": "2026-08-19"
+          },
+          {
+            "evidence_id": "bad20",
+            "source_url": "https://directory.case20.invalid/revenue",
+            "source_kind": "public_directory",
+            "title": "Fatturato non verificato",
+            "excerpt": "Una directory stima un fatturato non confermato.",
+            "observed_at": "2026-07-20T08:08:00+02:00",
+            "verified": false,
+            "tags": [
+              "signal:revenue_growth",
+              "hook:revenue"
+            ],
+            "valid_until": "2026-08-19"
+          }
+        ],
+        "as_of": "2026-07-20"
+      },
+      "expected": {
+        "fact_evidence_ids": [
+          "reg20",
+          "site20",
+          "job20"
+        ],
+        "signal_evidence_ids": [
+          "job20",
+          "news20"
+        ],
+        "persona_evidence_ids": [
+          "site20"
+        ],
+        "hook_evidence_ids": [
+          "news20"
+        ],
+        "omitted_evidence_ids": [
+          "bad20"
+        ],
+        "required_claim_fragments": [
+          "addetto amministrativo",
+          "nuovo impianto produttivo"
+        ]
+      }
+    }
+  ]
+}
