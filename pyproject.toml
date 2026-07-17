@@ -27,6 +27,10 @@ dev = [
 agent = [
   "claude-agent-sdk==0.2.119",
 ]
+ingress = [
+  "fastapi==0.139.2",
+  "uvicorn[standard]==0.51.0",
+]
 
 
 [tool.hatch.build.targets.wheel]

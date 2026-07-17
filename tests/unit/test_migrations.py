@@ -106,3 +106,33 @@ def test_research_migration_separates_immutable_audit_from_approved_cache() -> N
     assert "agent_sessions_research_identity_check" in research
     assert "requested_model IS NOT NULL" in research
     assert "lease_owner_token IS NOT NULL" in research
+
+
+def test_hot_signals_migration_separates_raw_landing_outbox_and_tasks() -> None:
+    hot = (ROOT / "supabase" / "migrations" / "202607150005_hot_signals.sql").read_text()
+
+    declared = set(re.findall(r"CREATE TABLE IF NOT EXISTS ([a-z_]+)", hot))
+    assert {"hot_signals", "signal_outbox", "hot_tasks"} <= declared
+
+    # replay-safe by construction (the migration is applied twice in integration tests)
+    assert "CREATE TABLE " not in hot.replace("CREATE TABLE IF NOT EXISTS", "")
+    assert "CREATE INDEX " not in hot.replace("CREATE INDEX IF NOT EXISTS", "")
+
+    # triple idempotency anchors: raw bytes -> event identity -> task effect
+    assert "UNIQUE (source, content_hash)" in hot
+    assert "UNIQUE (dedupe_key)" in hot
+    assert "UNIQUE (signal_natural_key)" in hot
+    assert "content_hash text NOT NULL CHECK (content_hash ~ '^[a-f0-9]{64}$')" in hot
+
+    # raw landing is append-only and carries no company FK (a signal may precede the hub)
+    assert "hot_signals_append_only" in hot
+    assert "hot_signal_id uuid NOT NULL REFERENCES hot_signals(id) ON DELETE RESTRICT" in hot
+    assert "piva text NOT NULL REFERENCES companies(piva) ON DELETE RESTRICT" in hot  # hot_tasks
+
+    # fenced work-queue state and the generated signal->task latency KPI
+    assert "status IN ('pending', 'leased', 'done', 'failed', 'dead')" in hot
+    assert "owner_token uuid" in hot
+    assert "GENERATED ALWAYS AS" in hot
+    assert "EXTRACT(EPOCH FROM (task_created_at - signal_received_at))" in hot
+    assert "CREATE OR REPLACE VIEW hot_signal_latency" in hot
+    assert "REVOKE ALL ON TABLE hot_signals, signal_outbox, hot_tasks FROM PUBLIC" in hot

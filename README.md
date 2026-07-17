@@ -5,7 +5,40 @@ compliance-checked, prioritised call queue. The repository is being built in eig
 independently verifiable milestones; the complete DEMO run and production wiring are
 documented in the final milestone.
 
-Current milestone: **M4 — cited research agent and blocking evaluation**.
+Current milestone: **M5 — event-driven hot-signal pipeline**.
+
+Fresh readiness signals (Company Monitoring, hiring, Clay webhooks) become a BDR
+call task with a cited dossier in minutes. A signed webhook ingress verifies each
+payload over its raw body, normalizes it to a neutral `HotSignal`, and enqueues it
+in one transaction (append-only raw landing plus an outbox event). A leased worker
+claims each event, assembles a verified evidence packet, runs the M4 research
+pipeline, and writes an internal `hot_task` carrying the `ApprovedDossier`. HubSpot
+delivery is M6; M5 stops at the durable task and measures the headline KPI —
+signal→task latency (the `hot_signal_latency` view).
+
+Every effect is idempotent (raw content hash → outbox dedupe key → task natural
+key), so a redelivered webhook never creates a second event or a duplicate task.
+The whole path runs offline with the deterministic DEMO agent and an in-memory
+outbox; a durable-execution engine (DBOS/Hatchet) can replace the Postgres poller
+behind the `Outbox`/`WorkflowRunner` ports at M8 without touching the domain
+workflow.
+
+Run the offline hot path (signal → event → dossier → task) with no DB or network:
+
+```bash
+uv run python -m list_engine.hot demo
+```
+
+The webhook ingress needs the optional `ingress` extra. Build the app with
+`list_engine.hot.ingress.create_ingress_app(...)` at a composition root — injecting
+the per-source signature verifiers (HMAC over the raw body, `SecretStr`) and a
+`SignalIngestService` — and serve it under uvicorn. Process the queue with the
+Postgres worker:
+
+```bash
+uv sync --extra dev --extra agent --extra ingress
+uv run python -m list_engine.hot worker --dsn "$DATABASE_URL"
+```
 
 The DEMO research path is deterministic and offline. Production generation uses
 the optional Claude Agent SDK adapter with every built-in tool, MCP server, skill,

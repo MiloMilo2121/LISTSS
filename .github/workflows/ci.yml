@@ -30,7 +30,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv sync --frozen --extra dev --extra agent
+      - run: uv sync --frozen --extra dev --extra agent --extra ingress
       - run: uv run ruff format --check .
       - run: uv run ruff check .
       - run: uv run mypy
@@ -39,6 +39,8 @@ jobs:
           uv run python -m list_engine.research.eval
           --golden evals/golden/research_cases.json
           | tee research-eval-report.json
+      - name: Blocking DEMO hot-path smoke
+        run: uv run python -m list_engine.hot demo
       - name: Optional Claude semantic regression gate
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
